@@ -26,6 +26,8 @@ export LESSHISTFILE=-
 
 # move go folder to local/share
 export GOPATH=$HOME/.local/share/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOPATH/bin
 
 # move zsh_sessions to cache
 export ZSH_SESSIONS_DIR=$HOME/.cache/zsh/sessions
