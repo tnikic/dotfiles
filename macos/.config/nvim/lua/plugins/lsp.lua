@@ -1,47 +1,68 @@
 return {
-    {
-        "williamboman/mason.nvim",
+	-- --------------------------------------------------
+	-- Mason
+	-- --------------------------------------------------
 
-        config = function()
-            require("mason").setup()
-        end,
-    },
+	{
+		"williamboman/mason.nvim",
 
-    {
-        "williamboman/mason-lspconfig.nvim",
+		config = function()
+			require("mason").setup({})
+		end,
+	},
 
-        config = function()
-            require("mason-lspconfig").setup({
-                ensure_installed = {
-                    -- Lua
-                    "lua_ls",
-                    -- golang
-                    "gopls",
-                },
-            })
-        end,
-    },
+	{
+		"williamboman/mason-lspconfig.nvim",
 
-    {
-        "neovim/nvim-lspconfig",
+		config = function()
+			require("mason-lspconfig").setup({
+				ensure_installed = {
+					-- Lua
+					"lua_ls",
+					-- golang
+					"gopls",
+				},
+			})
+		end,
+	},
 
-        config = function()
-            local capabilities = require("cmp_nvim_lsp").default_capabilities()
-            local lspconfig = require("lspconfig")
+	-- --------------------------------------------------
+	-- LSP
+	-- --------------------------------------------------
 
-            -- lua
-            lspconfig.lua_ls.setup({
-                capabilities = capabilities,
-            })
+	{
+		"neovim/nvim-lspconfig",
 
-            -- golang
-            lspconfig.gopls.setup({
-                capabilities = capabilities,
-            })
+		config = function()
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local lspconfig = require("lspconfig")
 
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
-            vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, {})
-        end,
-    },
+			-- lua
+			lspconfig.lua_ls.setup({
+				capabilities = capabilities,
+			})
+
+			-- golang
+			lspconfig.gopls.setup({
+				capabilities = capabilities,
+			})
+		end,
+	},
+
+	{
+		"nvimdev/lspsaga.nvim",
+
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+			"nvim-tree/nvim-web-devicons",
+		},
+
+		config = function()
+			require("lspsaga").setup({
+				outline = {
+					close_after_jump = true,
+				},
+			})
+		end,
+	},
 }
