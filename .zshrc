@@ -38,5 +38,5 @@ export ZSH_SESSIONS_DIR=$HOME/.cache/zsh/sessions
 # move the docker folder to local/share
 export DOCKER_CONFIG=$HOME/.local/share/docker
 
-# Using Node FNM
-eval "$(fnm env --use-on-cd)"
+# add node lts to path
+export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
