@@ -4,18 +4,18 @@ This is my personal dotfiles repository. It is of course an ongoing project that
 
 ## Packages
 
-| basics   | development | devops         | macos         | languages | fonts                    |
-| -------- | ----------- | -------------- | ------------- | --------- | ------------------------ |
-| bat      | git         | docker         | brave-browser | node@20   | jetbrains-mono-nerd-font |
-| eza      | lazygit     | kubernetes-cli | iina          | go        |                          |
-| fd       | sqlite      | helm           | obsidian      | python    |                          |
-| zoxide   | neovim      | k9s            | raycast       |           |                          |
-| ripgrep  |             | terraform      | wezterm       |           |                          |
-| zsh      |             |                | slack         |           |                          |
-| starship |             |                | displayplacer |           |                          |
-| tmux     |             |                |               |           |                          |
-| fzf      |             |                |               |           |                          |
-| stow     |             |                |               |           |                          |
+| basics   | development | devops         | design      | macos         | languages | fonts                    |
+| -------- | ----------- | -------------- | ----------- | ------------- | --------- | ------------------------ |
+| bat      | git         | docker         | libresprite | brave-browser | node@20   | jetbrains-mono-nerd-font |
+| eza      | lazygit     | kubernetes-cli |             | iina          | go        |                          |
+| fd       | sqlite      | helm           |             | obsidian      | python    |                          |
+| zoxide   | neovim      | k9s            |             | raycast       |           |                          |
+| ripgrep  | godot       | terraform      |             | wezterm       |           |                          |
+| zsh      |             |                |             | slack         |           |                          |
+| starship |             |                |             | displayplacer |           |                          |
+| tmux     |             |                |             |               |           |                          |
+| fzf      |             |                |             |               |           |                          |
+| stow     |             |                |             |               |           |                          |
 
 ## Installation
 
@@ -55,7 +55,7 @@ brew install node@20 go python
 ### GUI apps
 
 ```
-brew install --cask brave-browser docker iina obsidian raycast wezterm
+brew install --cask brave-browser docker iina obsidian raycast wezterm godot
 ```
 
 ### Fonts
