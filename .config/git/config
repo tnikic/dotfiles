@@ -1,0 +1,7 @@
+[init]
+	defaultBranch = main
+[user]
+	name = Tomislav Nikic
+	email = tomislav@nikic.org
+[core]
+	autocrlf = input

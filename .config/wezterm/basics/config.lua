@@ -3,16 +3,8 @@ local wezterm = require("wezterm")
 local module = {}
 
 function module.apply_to_config(config)
-	-- Tmux
-	config.default_prog = {
-		"/bin/zsh",
-		"-l",
-		"-c",
-		"/opt/homebrew/bin/tmux attach || /opt/homebrew/bin/tmux",
-	}
-
 	-- Font
-	config.color_scheme = "Tokyo Night Storm"
+	config.color_scheme = "Catppuccin Macchiato"
 	config.font = wezterm.font("JetBrainsMono Nerd Font")
 	config.font_size = 20
 
@@ -30,8 +22,13 @@ function module.apply_to_config(config)
 	config.scrollback_lines = 3000
 
 	-- Make it full screen
-	config.initial_rows = 999
-	config.initial_cols = 999
+  local mux = wezterm.mux
+
+  wezterm.on("gui-startup", function()
+    local tab, pane, window = mux.spawn_window{}
+    window:gui_window():maximize()
+  end)
+
 end
 
 return module

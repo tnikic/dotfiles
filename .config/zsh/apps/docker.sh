@@ -1,0 +1,1 @@
+export DOCKER_CONFIG="$XDG_DATA_HOME/docker"

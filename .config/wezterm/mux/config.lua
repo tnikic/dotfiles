@@ -1,18 +1,18 @@
 local wezterm = require("wezterm")
-local colorscheme = require("shared.colorscheme")
+local custom = wezterm.color.get_builtin_schemes()["Catppuccin Macchiato"]
 
 local module = {}
 
 function module.apply_to_config(config)
 	-- Enable Tab Bar
-	config.enable_tab_bar = false
+	config.enable_tab_bar = true
 
 	-- Styling
 	config.window_frame = {
 		font = wezterm.font("JetBrainsMono Nerd Font"),
 		font_size = 16.0,
-		active_titlebar_bg = colorscheme.bg,
-		inactive_titlebar_bg = colorscheme.bg,
+		active_titlebar_bg = wezterm.color.parse(custom.background),
+		inactive_titlebar_bg = wezterm.color.parse(custom.background)
 	}
 
 	-- Using the external bar

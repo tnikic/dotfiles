@@ -1,5 +1,5 @@
 local wezterm = require("wezterm")
-local colorscheme = require("shared.colorscheme")
+local custom = wezterm.color.get_builtin_schemes()["Catppuccin Macchiato"]
 
 -- Rounded edges
 local TAB_EDGE_LEFT = wezterm.nerdfonts.ple_left_half_circle_thick
@@ -15,12 +15,12 @@ local function tab_title(tab_info)
 end
 
 wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
-	local edge_background = colorscheme.bg
-	local background = colorscheme.fg_gutter
-	local foreground = colorscheme.bg
+	local edge_background = wezterm.color.parse(custom.background)
+	local background = wezterm.color.parse(custom.selection_bg)
+	local foreground = wezterm.color.parse(custom.background)
 
 	if tab.is_active then
-		background = colorscheme.red
+		background = wezterm.color.parse(custom.brights[2])
 		foreground = foreground:lighten(0.1)
 	elseif hover then
 		background = background:lighten(0.2)
