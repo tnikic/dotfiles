@@ -29,12 +29,17 @@ brew install eza fzf git lazygit neovim starship stow zsh zoxide
 
 #### Daily
 ```
-brew install --cask brave-browser docker iina obsidian wezterm bitwarden
+brew install --cask google-chrome docker iina obsidian wezterm bitwarden microsoft-office-businesspro windows-app
+```
+
+#### Languages
+```
+brew install go node@22
 ```
 
 #### Development
 ```
-brew install --cask webstorm goland intellij-idea visual-studio-code autodesk-fusion
+brew install --cask jetbrains-toolbox visual-studio-code autodesk-fusion firefox@developer-edition
 ```
 
 ### Fonts

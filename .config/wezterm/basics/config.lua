@@ -20,15 +20,6 @@ function module.apply_to_config(config)
 
 	-- Large history
 	config.scrollback_lines = 3000
-
-	-- Make it full screen
-  local mux = wezterm.mux
-
-  wezterm.on("gui-startup", function()
-    local tab, pane, window = mux.spawn_window{}
-    window:gui_window():maximize()
-  end)
-
 end
 
 return module
