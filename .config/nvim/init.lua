@@ -4,3 +4,4 @@ require('core.lsp')
 require('core.lazy')
 
 require('config.keymaps')
+require('config.autocommands')
