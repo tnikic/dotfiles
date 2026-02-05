@@ -1,0 +1,12 @@
+[tools]
+node = "latest"
+neovim = "nightly"
+lazygit = "latest"
+fzf = "latest"
+ripgrep = "latest"
+fd = "latest"
+eza = "latest"
+zoxide = "latest"
+starship = "latest"
+tmux = "latest"
+tree-sitter = "latest"
