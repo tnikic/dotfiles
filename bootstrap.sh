@@ -30,6 +30,7 @@ PACKAGES=(
     bluez
     networkmanager
     openssh
+	libfido2
 
     # GNOME Base
     gnome-shell
@@ -49,13 +50,12 @@ PACKAGES=(
     gnome-font-viewer
     gnome-keyring
     gnome-menus
-    gnome-sessions
+    gnome-session
     gnome-settings-daemon
     gnome-system-monitor
     gnome-weather
     loupe
     nautilus
-    papers
     sushi
     xdg-desktop-portal-gnome
 
@@ -87,6 +87,7 @@ PACKAGES=(
     chezmoi
 
     # Apps
+	xournalpp
     ghostty
     vivaldi
     teams-for-linux-bin
@@ -125,7 +126,7 @@ UNWANTED_DESKTOP_FILES=(
     "qvidcap.desktop"
     "bssh.desktop"
     "bvnc.desktop"
-    #"avahi-discover.desktop"
+    "avahi-discover.desktop"
     "nvim.desktop"
 )
 
@@ -138,6 +139,41 @@ for file in "${UNWANTED_DESKTOP_FILES[@]}"; do
         echo "$file does not exist, skipping"
     fi
 done
+
+echo "==> Setting up SSH key from YubiKey"
+SSH_DIR="$HOME/.ssh"
+mkdir -p "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+
+# Check if key already exists
+if [[ ! -f "$SSH_DIR/id_ed25519_sk_rk_"* ]]; then
+    echo "==> Please insert your YubiKey and touch it when it blinks..."
+    echo "==> Extracting resident SSH key from YubiKey"
+
+    # Extract the key to current directory first
+    ssh-keygen -K
+
+    # Find the extracted key (it will be named id_ed25519_sk_rk_*)
+    EXTRACTED_KEY=$(ls id_ed25519_sk_rk_* 2>/dev/null | grep -v '\.pub$' | head -n1)
+
+    if [[ -n "$EXTRACTED_KEY" ]]; then
+        # Move the extracted keys to .ssh directory
+        mv "$EXTRACTED_KEY" "$SSH_DIR/"
+        mv "${EXTRACTED_KEY}.pub" "$SSH_DIR/"
+
+        # Fix permissions
+        chmod 600 "$SSH_DIR/$EXTRACTED_KEY"
+        chmod 644 "$SSH_DIR/${EXTRACTED_KEY}.pub"
+
+        echo "==> SSH key extracted: $EXTRACTED_KEY"
+    else
+        echo "ERROR: Failed to extract key from YubiKey"
+        echo "Please ensure your YubiKey is inserted and contains a resident key"
+        exit 1
+    fi
+else
+    echo "==> SSH key already exists, skipping extraction"
+fi
 
 echo "==> Initialize and apply dotfiles with chezmoi"
 CHEZMOI_SOURCE_DIR="$HOME/.local/share/chezmoi"

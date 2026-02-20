@@ -1,5 +1,6 @@
 [tools]
 node = "latest"
+go = "latest"
 neovim = "nightly"
 lazygit = "latest"
 fzf = "latest"
