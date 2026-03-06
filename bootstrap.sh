@@ -1,205 +1,239 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/tnikic/dotfiles.git}"
+DOTFILES_REPO_SSH="${DOTFILES_REPO_SSH:-git@github.com:tnikic/dotfiles.git}"
 
-echo "==> Ensure pacman uses colors"
-sudo sed -i 's/^#Color/Color/' /etc/pacman.conf
+log() { printf '==> %s\n' "$*"; }
 
-echo "==> Ensure system and keyring are up to date"
+# -----------------------------------------------------------------------------
+# Pacman
+# -----------------------------------------------------------------------------
+log "Ensure pacman uses colors"
+if ! grep -qE '^[[:space:]]*Color\b' /etc/pacman.conf; then
+  sudo sed -i 's/^[[:space:]]*#\s*Color\s*$/Color/' /etc/pacman.conf || true
+else
+  log "pacman colors already enabled"
+fi
+
+log "Ensure system and keyring are up to date"
 sudo pacman -Sy --noconfirm --needed archlinux-keyring
 sudo pacman -Syu --noconfirm
 
-echo "==> Installing yay (AUR helper) non-interactively"
+# -----------------------------------------------------------------------------
+# AUR helper (yay)
+# -----------------------------------------------------------------------------
+log "Installing yay (AUR helper) non-interactively"
 if ! command -v yay >/dev/null 2>&1; then
-    sudo pacman -S --noconfirm --needed base-devel git
-    tmpdir="$(mktemp -d)"
-    git clone https://aur.archlinux.org/yay-bin.git "$tmpdir/yay-bin"
-    pushd "$tmpdir/yay-bin" >/dev/null
-    makepkg -sri --noconfirm
-    popd >/dev/null
-    rm -rf "$tmpdir"
+  sudo pacman -S --noconfirm --needed base-devel git
+  tmpdir="$(mktemp -d)"
+  git clone https://aur.archlinux.org/yay-bin.git "$tmpdir/yay-bin"
+  pushd "$tmpdir/yay-bin" >/dev/null
+  makepkg -sri --noconfirm
+  popd >/dev/null
+  rm -rf "$tmpdir"
 else
-    echo "==> yay already installed"
+  log "yay already installed"
 fi
 
-# Package list
-PACKAGES=(
-    # Core system
-    bluez
-    networkmanager
-    openssh
-	libfido2
+# -----------------------------------------------------------------------------
+# Packages (repo + AUR)
+# -----------------------------------------------------------------------------
+BASE=(
+  # Core system
+  bluez
+  networkmanager
+  openssh
+  libfido2
 
-    # GNOME Base
-    gnome-shell
-    gnome-control-center
-    gdm
+  # GNOME Base
+  gnome-shell
+  gnome-control-center
+  gdm
 
-    # GNOME apps
-    baobab
-    gnome-backgrounds
-    gnome-calculator
-    gnome-calendar
-    gnome-clocks
-    gnome-color-manager
-    gnome-connections
-    gnome-contacts
-    gnome-disk-utility
-    gnome-font-viewer
-    gnome-keyring
-    gnome-menus
-    gnome-session
-    gnome-settings-daemon
-    gnome-system-monitor
-    gnome-weather
-    loupe
-    nautilus
-    sushi
-    xdg-desktop-portal-gnome
+  # GNOME apps
+  baobab
+  papers
+  gnome-backgrounds
+  gnome-calculator
+  gnome-calendar
+  gnome-clocks
+  gnome-color-manager
+  gnome-contacts
+  gnome-disk-utility
+  gnome-font-viewer
+  gnome-keyring
+  gnome-menus
+  gnome-session
+  gnome-settings-daemon
+  gnome-system-monitor
+  gnome-weather
+  gvfs-goa
+  gvfs-dnssd
+  loupe
+  nautilus
+  sushi
+  xdg-desktop-portal-gnome
 
-    # GNOME Extra
-    extension-manager
-    gnome-tweaks
+  # GNOME Extra
+  extension-manager
+  gnome-tweaks
 
-    # Audio
-    pipewire
-    wireplumber
-    pipewire-alsa
-    pipewire-pulse
-    pipewire-jack
+  # Audio
+  pipewire
+  wireplumber
+  pipewire-alsa
+  pipewire-pulse
+  pipewire-jack
 
-    # Fonts
-    inter-font
-    noto-fonts
-    noto-fonts-emoji
-    ttf-jetbrains-mono-nerd
+  # Fonts
+  inter-font
+  noto-fonts
+  noto-fonts-emoji
+  ttf-jetbrains-mono-nerd
 
-    # CLI tools
-    git
-    curl
-    unzip
-    zip
-    zsh
-    man-db
-    mise
-    chezmoi
+  # CLI tools
+  git
+  curl
+  unzip
+  zip
+  zsh
+  man-db
+  mise
+  chezmoi
 
-    # Apps
-	xournalpp
-    ghostty
-    vivaldi
-    teams-for-linux-bin
-    libreoffice-fresh
-    libreoffice-fresh-de
-    thunderbird
+  # Zsh extras
+  zsh-syntax-highlighting
 
-    # Dev tools
-    docker
-    docker-compose
+  # Apps
+  vivaldi
+  ghostty
+  libreoffice-fresh
+  libreoffice-fresh-de
+  thunderbird
+
+  # Dev tools
+  docker
+  docker-compose
 )
 
-echo "==> Installing packages via yay (repo + AUR)"
-yay -S \
-    --noconfirm \
-    --sudoloop \
-    --needed \
-    "${PACKAGES[@]}"
+ADDITIONAL=(
+  # University
+  obsidian
+  remmina
+  freerdp
+  teams-for-linux-bin
+  zotero-bin
+  zoom
 
-echo "==> Installing devpod"
-curl -L -o devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-amd64" && sudo install -c -m 0755 devpod /usr/local/bin && rm -f devpod
+  # 3D Printing
+  orca-slicer-bin
+)
 
-echo "==> Enable Network and Bluetooth"
-sudo systemctl enable NetworkManager
-sudo systemctl enable bluetooth
+log "Installing packages via yay (skips already-installed packages)"
+yay -S --noconfirm --sudoloop --needed "${BASE[@]}"
 
-echo "==> Enable SSH server"
-sudo systemctl enable sshd
+log "Installing additional packages via yay (skips already-installed packages)"
+yay -S --noconfirm --sudoloop --needed "${ADDITIONAL[@]}"
 
-echo "==> Enable GDM"
-sudo systemctl enable gdm
+# -----------------------------------------------------------------------------
+# DevPod
+# -----------------------------------------------------------------------------
+log "Installing devpod"
+if ! command -v devpod >/dev/null 2>&1; then
+  tmpfile="$(mktemp)"
+  curl -fsSL -o "$tmpfile" "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-amd64"
+  sudo install -c -m 0755 "$tmpfile" /usr/local/bin/devpod
+  rm -f "$tmpfile"
+else
+  log "devpod already installed"
+fi
 
-echo "==> Remove unnecessary .desktop files from GNOME application menu"
+# -----------------------------------------------------------------------------
+# Services
+# -----------------------------------------------------------------------------
+log "Enable Network and Bluetooth"
+sudo systemctl enable --now NetworkManager
+sudo systemctl enable --now bluetooth
+
+log "Enable SSH server"
+sudo systemctl enable --now sshd
+
+log "Enable GDM"
+sudo systemctl enable --now gdm
+
+log "Enable Docker"
+sudo systemctl enable --now docker
+
+# -----------------------------------------------------------------------------
+# Add docker to user
+# -----------------------------------------------------------------------------
+sudo usermod -a -G docker $USER
+
+# -----------------------------------------------------------------------------
+# GNOME application menu cleanup
+# -----------------------------------------------------------------------------
+log "Remove unnecessary .desktop files from GNOME application menu"
 UNWANTED_DESKTOP_FILES=(
-    "qv4l2.desktop"
-    "qvidcap.desktop"
-    "bssh.desktop"
-    "bvnc.desktop"
-    "avahi-discover.desktop"
-    "nvim.desktop"
+  "qv4l2.desktop"
+  "qvidcap.desktop"
+  "qdbusviewer.desktop"
+  "lstopo.desktop"
+  "assistant.desktop"
+  "linguist.desktop"
+  "designer.desktop"
+  "bssh.desktop"
+  "bvnc.desktop"
+  "avahi-discover.desktop"
+  "nvim.desktop"
 )
 
 for file in "${UNWANTED_DESKTOP_FILES[@]}"; do
-    desktop_file_path="/usr/share/applications/$file"
-    if [[ -f "$desktop_file_path" ]]; then
-        echo "Removing $file"
-        sudo rm -f "$desktop_file_path"
-    else
-        echo "$file does not exist, skipping"
-    fi
+  desktop_file_path="/usr/share/applications/$file"
+  if [[ -f "$desktop_file_path" ]]; then
+    log "Removing $file"
+    sudo rm -f "$desktop_file_path"
+  else
+    log "$file does not exist, skipping"
+  fi
 done
 
-echo "==> Setting up SSH key from YubiKey"
-SSH_DIR="$HOME/.ssh"
-mkdir -p "$SSH_DIR"
-chmod 700 "$SSH_DIR"
-
-# Check if key already exists
-if [[ ! -f "$SSH_DIR/id_ed25519_sk_rk_"* ]]; then
-    echo "==> Please insert your YubiKey and touch it when it blinks..."
-    echo "==> Extracting resident SSH key from YubiKey"
-
-    # Extract the key to current directory first
-    ssh-keygen -K
-
-    # Find the extracted key (it will be named id_ed25519_sk_rk_*)
-    EXTRACTED_KEY=$(ls id_ed25519_sk_rk_* 2>/dev/null | grep -v '\.pub$' | head -n1)
-
-    if [[ -n "$EXTRACTED_KEY" ]]; then
-        # Move the extracted keys to .ssh directory
-        mv "$EXTRACTED_KEY" "$SSH_DIR/"
-        mv "${EXTRACTED_KEY}.pub" "$SSH_DIR/"
-
-        # Fix permissions
-        chmod 600 "$SSH_DIR/$EXTRACTED_KEY"
-        chmod 644 "$SSH_DIR/${EXTRACTED_KEY}.pub"
-
-        echo "==> SSH key extracted: $EXTRACTED_KEY"
-    else
-        echo "ERROR: Failed to extract key from YubiKey"
-        echo "Please ensure your YubiKey is inserted and contains a resident key"
-        exit 1
-    fi
-else
-    echo "==> SSH key already exists, skipping extraction"
-fi
-
-echo "==> Initialize and apply dotfiles with chezmoi"
+# -----------------------------------------------------------------------------
+# Dotfiles (chezmoi)
+# -----------------------------------------------------------------------------
+log "Initialize and apply dotfiles with chezmoi"
 CHEZMOI_SOURCE_DIR="$HOME/.local/share/chezmoi"
 
 if [[ -d "$CHEZMOI_SOURCE_DIR/.git" ]]; then
-    echo "==> Chezmoi already initialized, updating..."
-    chezmoi update --force
+  log "Chezmoi already initialized."
 else
-    echo "==> Initializing chezmoi from repository..."
-    chezmoi init --apply "$DOTFILES_REPO"
+  log "Initializing chezmoi from repository..."
+  chezmoi init --apply "$DOTFILES_REPO"
 fi
 
-echo "==> Installing CLI tools via mise"
-# mise will read from .config/mise/config.toml managed by chezmoi
+chezmoi git remote set-url origin $DOTFILES_REPO_SSH
+
+# -----------------------------------------------------------------------------
+# mise
+# -----------------------------------------------------------------------------
+log "Installing CLI tools via mise"
 mise install
 
-echo "==> Set default shell to zsh"
+# -----------------------------------------------------------------------------
+# Default shell
+# -----------------------------------------------------------------------------
+log "Set default shell to zsh"
 if command -v zsh >/dev/null 2>&1; then
-    ZSH_PATH="$(command -v zsh)"
-    if [[ "${SHELL:-}" != "$ZSH_PATH" ]]; then
-        sudo chsh -s "$ZSH_PATH" "$USER" || echo "WARN: chsh failed; run: sudo chsh -s \"$ZSH_PATH\" \"$USER\""
-    fi
-    # Clean bash configs after migrating fully to zsh
-    rm -f "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.bash_logout" "$HOME/.bash_history" || true
+  ZSH_PATH="$(command -v zsh)"
+  if [[ "${SHELL:-}" != "$ZSH_PATH" ]]; then
+    sudo chsh -s "$ZSH_PATH" "$USER" || echo "WARN: chsh failed; run: sudo chsh -s \"$ZSH_PATH\" \"$USER\""
+  else
+    log "Default shell already set to zsh"
+  fi
+
+  rm -f "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.bash_logout" "$HOME/.bash_history" || true
 else
-    echo "WARN: zsh not found in PATH"
+  echo "WARN: zsh not found in PATH" >&2
 fi
 
 cat <<'EOF'
