@@ -9,15 +9,7 @@ log() { printf '==> %s\n' "$*"; }
 # -----------------------------------------------------------------------------
 # Pacman
 # -----------------------------------------------------------------------------
-log "Ensure pacman uses colors"
-if ! grep -qE '^[[:space:]]*Color\b' /etc/pacman.conf; then
-  sudo sed -i 's/^[[:space:]]*#\s*Color\s*$/Color/' /etc/pacman.conf || true
-else
-  log "pacman colors already enabled"
-fi
-
-log "Ensure system and keyring are up to date"
-sudo pacman -Sy --noconfirm --needed archlinux-keyring
+log "Ensure system is up to date"
 sudo pacman -Syu --noconfirm
 
 # -----------------------------------------------------------------------------
