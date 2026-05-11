@@ -3,13 +3,8 @@ require("fzf-lua").register_ui_select()
 
 local key = vim.keymap.set
 
--- Files and Buffers
-key("n", "<leader>ff", "<cmd>FzfLua files<cr>")
-key("n", "<leader>fb", "<cmd>FzfLua buffers<cr>")
-
--- LSP
-key("n", "<leader>gr", "<cmd>FzfLua lsp_references<cr>")
-key("n", "<leader>gd", "<cmd>FzfLua lsp_definitions<cr>")
-key("n", "<leader>gi", "<cmd>FzfLua lsp_implementations<cr>")
-key("n", "<leader>ca", "<cmd>FzfLua lsp_code_actions<cr>")
-key("n", "<leader>da", "<cmd>FzfLua diagnostics_workspace<cr>")
+key("n", "<leader>ff", "<cmd>FzfLua files<CR>", { desc = "Files" })
+key("n", "<leader>fb", "<cmd>FzfLua buffers<CR>", { desc = "Buffers" })
+key("n", "<leader>fs", "<cmd>FzfLua live_grep<CR>", { desc = "Live grep" })
+key("n", "<leader>fh", "<cmd>FzfLua help_tags<CR>", { desc = "Help tags" })
+key("n", "<leader>fd", "<cmd>FzfLua diagnostics_workspace<CR>", { desc = "Workspace diagnostics" })

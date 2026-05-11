@@ -1,7 +1,7 @@
 [tools]
 node = "latest"
 go = "latest"
-neovim = "nightly"
+neovim = "latest"
 lazygit = "latest"
 fzf = "latest"
 ripgrep = "latest"
