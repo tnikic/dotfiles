@@ -3,5 +3,10 @@
 [user]
 	name = Tomislav Nikic
 	email = tomislav@nikic.org
+	signingkey = /home/tomislav/.ssh/id_ed25519_sk_rk_tomislav@nikic.org.pub
 [core]
 	autocrlf = input
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
