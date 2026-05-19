@@ -24,8 +24,7 @@ vim.pack.add({
 	},
 
 	-- AI
-	{ src = "https://github.com/zbirenbaum/copilot.lua" },
-	{ src = "https://github.com/fang2hou/blink-copilot" },
+	{ src = "https://github.com/github/copilot.vim" },
 
 	-- Syntax
 	{
@@ -46,5 +45,4 @@ require("plugins.nvim-treesitter")
 
 require("plugins.mason")
 require("plugins.conform")
-require("plugins.copilot")
 require("plugins.blink")
