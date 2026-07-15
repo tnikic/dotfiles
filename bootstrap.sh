@@ -60,8 +60,6 @@ BASE=(
   gnome-settings-daemon
   gnome-system-monitor
   gnome-weather
-  gvfs-goa
-  gvfs-dnssd
   loupe
   nautilus
   sushi
@@ -87,6 +85,7 @@ BASE=(
   # CLI tools
   git
   curl
+  wget
   unzip
   zip
   zsh
@@ -98,15 +97,14 @@ BASE=(
   zsh-syntax-highlighting
 
   # Apps
-  vivaldi
   ghostty
   libreoffice-fresh
   libreoffice-fresh-de
   thunderbird
+  firefox
 
   # Dev tools
-  docker
-  docker-compose
+  podman
 )
 
 ADDITIONAL=(
@@ -129,19 +127,6 @@ log "Installing additional packages via yay (skips already-installed packages)"
 yay -S --noconfirm --sudoloop --needed "${ADDITIONAL[@]}"
 
 # -----------------------------------------------------------------------------
-# DevPod
-# -----------------------------------------------------------------------------
-log "Installing devpod"
-if ! command -v devpod >/dev/null 2>&1; then
-  tmpfile="$(mktemp)"
-  curl -fsSL -o "$tmpfile" "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-amd64"
-  sudo install -c -m 0755 "$tmpfile" /usr/local/bin/devpod
-  rm -f "$tmpfile"
-else
-  log "devpod already installed"
-fi
-
-# -----------------------------------------------------------------------------
 # Services
 # -----------------------------------------------------------------------------
 log "Enable Network and Bluetooth"
@@ -153,14 +138,6 @@ sudo systemctl enable --now sshd
 
 log "Enable GDM"
 sudo systemctl enable --now gdm
-
-log "Enable Docker"
-sudo systemctl enable --now docker
-
-# -----------------------------------------------------------------------------
-# Add docker to user
-# -----------------------------------------------------------------------------
-sudo usermod -a -G docker $USER
 
 # -----------------------------------------------------------------------------
 # GNOME application menu cleanup
