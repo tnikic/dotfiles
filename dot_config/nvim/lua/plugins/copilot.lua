@@ -1,8 +1,7 @@
-require("copilot").setup({
-	suggestion = { enabled = false },
-	panel = { enabled = false },
-	filetypes = {
-		markdown = true,
-		help = true,
-	},
+vim.g.copilot_no_tab_map = true
+
+vim.keymap.set("i", "<S-Tab>", 'copilot#Accept("\\<CR>")', {
+	expr = true,
+	replace_keycodes = false,
+	silent = true,
 })

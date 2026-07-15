@@ -46,3 +46,5 @@ require("plugins.nvim-treesitter")
 require("plugins.mason")
 require("plugins.conform")
 require("plugins.blink")
+
+require("plugins.copilot")
